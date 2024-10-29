@@ -5,7 +5,8 @@ import argparse
 
 async def main(paperless):
     await paperless.initialize()
-    async for doc in paperless.documents.search(f"asn:[1 TO 105]"):
+    docs = [doc async for doc in paperless.documents.search(f"asn:[1 TO 105]")]
+    for doc in sorted(docs, key=lambda x: x.archive_serial_number):
         print(f"ASN{doc.archive_serial_number}: {doc.title}")
     await paperless.close()
 
