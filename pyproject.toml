@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "pltool"
+version = "0.1.0"
+description = "Tool for Paperless-NGX"
+authors = ["Sebastian Stark <sstark@mailbox.org>"]
+readme = "README.md"
+
+[tool.poetry.scripts]
+pltool = 'pltool.cli:cliRun'
+
+[tool.poetry.dependencies]
+python = "^3.11"
+pypaperless = "^3.1.15"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.3"
+mypy = "^1.13.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
