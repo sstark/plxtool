@@ -5,8 +5,18 @@ import argparse
 
 async def main(paperless):
     await paperless.initialize()
-    docs = [doc async for doc in paperless.documents.search(f"asn:[1 TO 105]")]
-    for doc in sorted(docs, key=lambda x: x.archive_serial_number):
+    # I gave up on querying the API for 'query=asn:[1 TO 10]', as I got totally
+    # random results.
+    # See also https://github.com/paperless-ngx/paperless-ngx/discussions/3139
+    # Retrieve all documents and filter ourselves:
+    docs = sorted(
+        filter(
+            lambda x: x.archive_serial_number >= 1 and x.archive_serial_number <= 10,
+            [doc async for doc in paperless.documents if doc.archive_serial_number],
+        ),
+        key=lambda x: x.archive_serial_number,
+    )
+    for doc in docs:
         print(f"ASN{doc.archive_serial_number}: {doc.title}")
     await paperless.close()
 
