@@ -1,6 +1,7 @@
 import asyncio
 from pypaperless import Paperless
 import argparse
+import io
 
 
 async def docs_by_asnrange(paperless, start, end):
@@ -16,14 +17,26 @@ async def docs_by_asnrange(paperless, start, end):
             and doc.archive_serial_number >= start
             and doc.archive_serial_number <= end
         ],
-        key=lambda x: x.archive_serial_number,
+        key=lambda x: -x.archive_serial_number,
     )
 
 
 async def main(paperless):
     await paperless.initialize()
-    for doc in await docs_by_asnrange(paperless, 1, 10):
-        print(f"ASN{doc.archive_serial_number}: {doc.title}")
+    html = io.StringIO()
+    html.write("<html><head><title>Paperless Index</title>\n")
+    html.write("<style>body {font-size: 12px;}</style>\n")
+    html.write("</head><body><table>\n")
+    for doc in await docs_by_asnrange(paperless, 1, 100):
+        html.write("<tr>\n")
+        html.write(f"<td>ASN{doc.archive_serial_number}</td>")
+        html.write(f"<td>{doc.correspondent}</td>\n")
+        html.write(f"<td>{doc.title}</td>\n")
+        html.write(f"<td>{doc.created_date}</td>\n")
+        html.write("</tr>\n")
+    html.write("</table></body></html>\n")
+    html.flush()
+    print(html.getvalue())
     await paperless.close()
 
 
