@@ -30,11 +30,13 @@ async def main(paperless):
     cor = await corrmap(paperless)
     html = io.StringIO()
     html.write("<html><head><title>Paperless Index</title>\n")
-    html.write("<style>body{font-size: 12px;}</style>\n")
+    html.write(
+        "<style>body{font-size:12px;}.asn{font-weight:bold;text-align:right;}</style>\n"
+    )
     html.write("</head><body><table>\n")
     for doc in await docs_by_asnrange(paperless, 1, 105):
         html.write("<tr>\n")
-        html.write(f"<td>ASN{doc.archive_serial_number}</td>")
+        html.write(f'<td class="asn">{doc.archive_serial_number}</td>')
         html.write(f"<td>{cor[doc.correspondent]}</td>\n")
         html.write(f"<td>{doc.title}</td>\n")
         html.write(f"<td>{doc.created_date}</td>\n")
