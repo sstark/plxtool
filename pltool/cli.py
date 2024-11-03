@@ -1,10 +1,13 @@
 import asyncio
 from pypaperless import Paperless
+from pypaperless.models.documents import Document
 import argparse
 import io
 
 
-async def docs_by_asnrange(paperless, start, end):
+async def docs_by_asnrange(
+    paperless: Paperless, start: int, end: int
+) -> list[Document]:
     # I gave up on querying the API for 'query=asn:[1 TO 10]', as I got totally
     # random results.
     # See also https://github.com/paperless-ngx/paperless-ngx/discussions/3139
@@ -21,11 +24,11 @@ async def docs_by_asnrange(paperless, start, end):
     )
 
 
-async def corrmap(paperless):
+async def corrmap(paperless: Paperless) -> dict[int | None, str | None]:
     return dict([(c.id, c.name) async for c in paperless.correspondents])
 
 
-async def index(paperless, start, end):
+async def index(paperless: Paperless, start: int, end: int):
     await paperless.initialize()
     cor = await corrmap(paperless)
     if end == 0:
@@ -49,14 +52,14 @@ async def index(paperless, start, end):
     await paperless.close()
 
 
-def createArgumentParser():
+def createArgumentParser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="pltool", description="pltool description")
     parser.add_argument("-u", "--url", required=True, help="Paperless Server URL")
     parser.add_argument(
         "-a", "--auth", required=True, help="Paperless Authentication Token"
     )
-    subparsers = parser.add_subparsers(help='Available subcommands')
-    parser_index = subparsers.add_parser('index', help='Create ASN index PDF')
+    subparsers = parser.add_subparsers(help="Available subcommands")
+    parser_index = subparsers.add_parser("index", help="Create ASN index PDF")
     parser_index.add_argument("-s", "--start", type=int, help="Start at this ASN")
     parser_index.add_argument("-e", "--end", type=int, help="End at this ASN")
     return parser
