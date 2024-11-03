@@ -25,16 +25,18 @@ async def corrmap(paperless):
     return dict([(c.id, c.name) async for c in paperless.correspondents])
 
 
-async def main(paperless):
+async def index(paperless, start, end):
     await paperless.initialize()
     cor = await corrmap(paperless)
+    if end == 0:
+        end = await paperless.documents.get_next_asn() - 1
     html = io.StringIO()
     html.write("<html><head><title>Paperless Index</title>\n")
     html.write(
         "<style>body{font-size:12px;}td{padding-top:4px;}.asn{font-weight:bold;text-align:right;}</style>\n"
     )
     html.write("</head><body><table>\n")
-    for doc in await docs_by_asnrange(paperless, 1, 105):
+    for doc in await docs_by_asnrange(paperless, start, end):
         html.write("<tr>\n")
         html.write(f'<td class="asn">{doc.archive_serial_number}</td>')
         html.write(f"<td>{cor[doc.correspondent]}</td>\n")
@@ -53,6 +55,10 @@ def createArgumentParser():
     parser.add_argument(
         "-a", "--auth", required=True, help="Paperless Authentication Token"
     )
+    subparsers = parser.add_subparsers(help='Available subcommands')
+    parser_index = subparsers.add_parser('index', help='Create ASN index PDF')
+    parser_index.add_argument("-s", "--start", type=int, help="Start at this ASN")
+    parser_index.add_argument("-e", "--end", type=int, help="End at this ASN")
     return parser
 
 
@@ -60,4 +66,6 @@ def cliRun():
     parser = createArgumentParser()
     args = parser.parse_args()
     paperless = Paperless(args.url, args.auth)
-    asyncio.run(main(paperless))
+    start = args.start if args.start else 1
+    end = args.end if args.end else 0
+    asyncio.run(index(paperless, start, end))
