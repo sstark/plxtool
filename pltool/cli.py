@@ -3,6 +3,8 @@ from pypaperless import Paperless
 from pypaperless.models.documents import Document
 import argparse
 import io
+from pathlib import Path
+from subprocess import CalledProcessError, run
 
 
 async def docs_by_asnrange(
@@ -52,23 +54,70 @@ async def index(paperless: Paperless, start: int, end: int):
     await paperless.close()
 
 
+def overlay_mount(src: Path, target: Path) -> bool:
+    if not src.exists():
+        print(f"{src} does not exist")
+        return False
+    if not target.exists():
+        print(f"Mountpoint {target} does not exist")
+        return False
+    originals = next(src.rglob("originals"), None)
+    if originals is None:
+        print('"originals" folder not found')
+        return False
+    archive = next(src.rglob("archive"), None)
+    if archive is None:
+        print('"archive" folder not found')
+        return False
+    if originals.parent != archive.parent:
+        print(f"{archive} and {originals} are not in same directory")
+        return False
+    cmd = [
+        "sudo",
+        "mount",
+        "-t",
+        "overlay",
+        "overlay",
+        f"-olowerdir={originals}:{archive}",
+        target,
+    ]
+    try:
+        run(cmd, check=True)
+        print(f"Mount successful. You can access your documents under {target}")
+        return True
+    except CalledProcessError as e:
+        print(f"Mounting returned an error: {e}")
+        return False
+
+
 def createArgumentParser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="pltool", description="pltool description")
-    parser.add_argument("-u", "--url", required=True, help="Paperless Server URL")
-    parser.add_argument(
-        "-a", "--auth", required=True, help="Paperless Authentication Token"
-    )
-    subparsers = parser.add_subparsers(help="Available subcommands")
+    parser.add_argument("-u", "--url", help="Paperless Server URL")
+    parser.add_argument("-a", "--auth", help="Paperless Authentication Token")
+    subparsers = parser.add_subparsers(dest="command", help="Available subcommands")
     parser_index = subparsers.add_parser("index", help="Create ASN index PDF")
     parser_index.add_argument("-s", "--start", type=int, help="Start at this ASN")
     parser_index.add_argument("-e", "--end", type=int, help="End at this ASN")
+    parser_index = subparsers.add_parser(
+        "mount", help="Overlay mount originals and archive document directory"
+    )
+    parser_index.add_argument(
+        "-s",
+        "--src",
+        required=True,
+        help="Paperless folder (will search for originals/archive)",
+    )
+    parser_index.add_argument("-t", "--target", required=True, help="Mount point")
     return parser
 
 
 def cliRun():
     parser = createArgumentParser()
     args = parser.parse_args()
-    paperless = Paperless(args.url, args.auth)
-    start = args.start if args.start else 1
-    end = args.end if args.end else 0
-    asyncio.run(index(paperless, start, end))
+    if args.command == "index":
+        paperless = Paperless(args.url, args.auth)
+        start = args.start if args.start else 1
+        end = args.end if args.end else 0
+        asyncio.run(index(paperless, start, end))
+    elif args.command == "mount":
+        overlay_mount(Path(args.src), Path(args.target))
