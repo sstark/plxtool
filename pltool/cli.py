@@ -31,7 +31,7 @@ async def main(paperless):
     html = io.StringIO()
     html.write("<html><head><title>Paperless Index</title>\n")
     html.write(
-        "<style>body{font-size:12px;}.asn{font-weight:bold;text-align:right;}</style>\n"
+        "<style>body{font-size:12px;}td{padding-top:4px;}.asn{font-weight:bold;text-align:right;}</style>\n"
     )
     html.write("</head><body><table>\n")
     for doc in await docs_by_asnrange(paperless, 1, 105):
