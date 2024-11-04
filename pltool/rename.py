@@ -6,7 +6,7 @@ from prompt_toolkit.styles import Style
 
 
 skip = False
-exit = False
+exitLoop = False
 kb = KeyBindings()
 style = Style([("b", "#abc993 bold")])
 
@@ -23,8 +23,8 @@ def bottom_toolbar():
 
 @kb.add("c-c")
 def _(event):
-    global exit
-    exit = True
+    global exitLoop
+    exitLoop = True
     event.app.exit()
 
 
@@ -42,7 +42,7 @@ def _(event):
 
 
 def interactive_rename(field: str):
-    while exit == False:
+    while not exitLoop:
         skip = False
         text = prompt(
             f"({field}): ",
@@ -51,7 +51,7 @@ def interactive_rename(field: str):
             bottom_toolbar=bottom_toolbar,
             style=style,
         )
-        if not exit:
+        if not exitLoop:
             if skip:
                 print("skipping")
             else:

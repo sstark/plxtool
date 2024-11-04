@@ -11,6 +11,7 @@ pltool = 'pltool.cli:cliRun'
 [tool.poetry.dependencies]
 python = "^3.11"
 pypaperless = "^3.1.15"
+prompt-toolkit = "^3.0.48"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.3"
