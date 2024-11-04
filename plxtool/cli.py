@@ -5,7 +5,7 @@ import argparse
 import io
 from pathlib import Path
 from subprocess import CalledProcessError, run
-from pltool.rename import interactive_rename
+from plxtool.rename import interactive_rename
 
 
 async def docs_by_asnrange(
@@ -92,7 +92,7 @@ def overlay_mount(src: Path, target: Path) -> bool:
 
 
 def createArgumentParser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(prog="pltool", description="pltool description")
+    parser = argparse.ArgumentParser(prog="plxtool", description="plxtool description")
     parser.add_argument("-u", "--url", help="Paperless Server URL")
     parser.add_argument("-a", "--auth", help="Paperless Authentication Token")
     subparsers = parser.add_subparsers(dest="command", help="Available subcommands")

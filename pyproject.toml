@@ -1,12 +1,12 @@
 [tool.poetry]
-name = "pltool"
+name = "plxtool"
 version = "0.1.0"
 description = "Tool for Paperless-NGX"
 authors = ["Sebastian Stark <sstark@mailbox.org>"]
 readme = "README.md"
 
 [tool.poetry.scripts]
-pltool = 'pltool.cli:cliRun'
+plxtool = 'plxtool.cli:cliRun'
 
 [tool.poetry.dependencies]
 python = "^3.11"

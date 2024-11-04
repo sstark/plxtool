@@ -1,13 +1,13 @@
-# pltool
+# plxtool
 
-## pltool rename (TODO)
+## plxtool rename (TODO)
 
 Bulk rename title field
 
-## pltool indexpage (TODO)
+## plxtool index
 
 Generate PDF index page sorted by ASN
 
-## pltool mount (TODO)
+## plxtool mount
 
 overlayfs mount
