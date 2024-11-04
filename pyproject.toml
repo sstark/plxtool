@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "plxtool"
 version = "0.1.0"
-description = "Tool for Paperless-NGX"
+description = "Tool for Paperless-ngx"
 authors = ["Sebastian Stark <sstark@mailbox.org>"]
 readme = "README.md"
 
