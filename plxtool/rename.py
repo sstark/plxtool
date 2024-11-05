@@ -5,7 +5,6 @@ from prompt_toolkit.formatted_text import to_formatted_text
 from prompt_toolkit.styles import Style
 
 
-skip = False
 exitLoop = False
 kb = KeyBindings()
 style = Style([("b", "#abc993 bold")])
@@ -20,6 +19,8 @@ def bottom_toolbar():
         )
     )
 
+class SkipEvent(Exception):
+    pass
 
 @kb.add("c-c")
 def _(event):
@@ -30,9 +31,7 @@ def _(event):
 
 @kb.add("c-n")
 def _(event):
-    global skip
-    skip = True
-    event.app.exit()
+    event.app.exit(exception=SkipEvent)
 
 
 @kb.add("c-s")
@@ -43,16 +42,15 @@ def _(event):
 
 def interactive_rename(field: str):
     while not exitLoop:
-        skip = False
-        text = prompt(
-            f"({field}): ",
-            default="Receipt-for-Stuff",
-            key_bindings=kb,
-            bottom_toolbar=bottom_toolbar,
-            style=style,
-        )
-        if not exitLoop:
-            if skip:
-                print("skipping")
-            else:
+        try:
+            text = prompt(
+                f"({field}): ",
+                default="Receipt-for-Stuff",
+                key_bindings=kb,
+                bottom_toolbar=bottom_toolbar,
+                style=style,
+            )
+            if not exitLoop:
                 print(f"Setting {field} to {text}")
+        except SkipEvent:
+            print("skip event")
