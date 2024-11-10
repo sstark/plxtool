@@ -12,6 +12,7 @@ plxtool = 'plxtool.cli:cliRun'
 python = "^3.11"
 pypaperless = "^3.1.15"
 prompt-toolkit = "^3.0.48"
+weasyprint = "^63.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.3"
