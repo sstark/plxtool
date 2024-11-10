@@ -5,6 +5,8 @@ from pathlib import Path
 from plxtool.rename import interactive_rename
 from plxtool.index import index
 from plxtool.mount import overlay_mount
+import os
+from collections.abc import MutableMapping
 
 
 def createArgumentParser() -> argparse.ArgumentParser:
@@ -35,9 +37,30 @@ def createArgumentParser() -> argparse.ArgumentParser:
     return parser
 
 
+def get_auth(args: argparse.Namespace, env: MutableMapping = os.environ) -> tuple[str, str]:
+    url = ""
+    auth = ""
+    if args.url:
+        url = args.url
+    else:
+        try:
+            url = env["PLXTOOL_PAPERLESS_URL"]
+        except KeyError:
+            print("Paperless URL missing")
+    if args.auth:
+        auth = args.auth
+    else:
+        try:
+            auth = env["PLXTOOL_PAPERLESS_AUTH"]
+        except KeyError:
+            print("Paperless API token missing")
+    return (url, auth)
+
+
 def cliRun():
     parser = createArgumentParser()
     args = parser.parse_args()
+
     if args.command == "index":
         paperless = Paperless(args.url, args.auth)
         start = args.start if args.start else 1
